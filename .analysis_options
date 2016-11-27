@@ -1,0 +1,9 @@
+analyzer:
+  strong-mode: true
+
+#   exclude:
+#     - path/to/excluded/files/**
+# linter:
+#   rules:
+#     # see catalog here: http://dart-lang.github.io/linter/lints/
+#     - hash_and_equals

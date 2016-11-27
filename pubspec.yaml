@@ -1,0 +1,18 @@
+name: flutter_stream_widget
+description: A Flutter widget that
+version: 0.0.1
+author: brian.egan <brian@brianegan.com>
+homepage: https://gitlab.com/brianegan/flutter_stream_widget
+
+environment:
+  sdk: '>=1.0.0 <2.0.0'
+
+dependencies:
+  meta: any
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  test: '>=0.12.0 <0.13.0'
+  flutter_test:
+    sdk: flutter
