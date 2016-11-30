@@ -1,0 +1,8 @@
+image: brianegan/flutter:v3
+
+stages:
+  - test
+
+unit_test:
+  stage: test
+  script: flutter test
