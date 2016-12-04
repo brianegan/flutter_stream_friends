@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_stream_widget/flutter_stream_widget.dart';
+import 'package:flutter_stream_friends/flutter_stream_friends.dart';
 
 class TestStreamWidget extends StreamWidget<String> {
   final Stream<String> testStream;
   String currentState = "";
 
   TestStreamWidget(String initialState, this.testStream, {Key key})
-      : super(initialState: initialState, key: key);
+      : super(initialState, key: key);
 
   @override
   Widget build(BuildContext context, String widgetModel) {
@@ -17,7 +17,7 @@ class TestStreamWidget extends StreamWidget<String> {
   }
 
   @override
-  Stream<String> buildStream() {
+  Stream<String> createStream() {
     return testStream;
   }
 }

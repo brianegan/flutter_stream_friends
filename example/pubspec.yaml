@@ -1,0 +1,8 @@
+name: flutter_stream_friends_example
+description: A demo of the flutter_stream_friends functionality
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_stream_friends:
+    path: ../
+  rxdart: 0.4.8

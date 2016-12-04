@@ -1,0 +1,129 @@
+library flutter_stream_callbacks;
+
+import 'dart:async';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+
+/// It's a stream and a callback in one. It's a StreamCallback!
+///
+/// This class is meant to convert Flutter events, such as Taps or Drags, into a
+/// Stream of those events. This is useful when creating applications that rely
+/// more heavily on stream-based architectures.
+abstract class StreamCallback<T> extends Stream<T> implements Function {
+  final StreamController<T> streamController =
+      new StreamController.broadcast(sync: true);
+
+  @override
+  StreamSubscription<T> listen(void onData(T event),
+      {Function onError, void onDone(), bool cancelOnError}) {
+    return streamController.stream.listen(onData,
+        onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  }
+}
+
+/// Handles [VoidCallback] events
+///
+/// Unfortunately, you cannot create void value streams in Dart, in
+/// the same way you can create a callback with no parameters. Therefore, the
+/// Null class is used, and should be ignored.
+class VoidStreamCallback extends StreamCallback<Null> {
+  call() => streamController.add(null);
+}
+
+/// The base single-value implementation
+///
+/// Extend this class with a simple type parameter to create a new
+/// StreamCallback if the callback consists of only a single value.
+class ValueStreamCallback<T> extends StreamCallback<T> {
+  call(T value) => streamController.add(value);
+}
+
+/// Handles [GestureDragDownCallback] events
+class DragDownStreamCallback extends ValueStreamCallback<DragDownDetails> {}
+
+/// Handles [GestureDragStartCallback] events
+class DragStartStreamCallback extends ValueStreamCallback<DragStartDetails> {}
+
+/// Handles [GestureDragUpdateCallback] events
+class DragUpdateStreamCallback extends ValueStreamCallback<DragUpdateDetails> {}
+
+/// Handles [GestureDragEndCallback] events
+class DragEndStreamCallback extends ValueStreamCallback<DragEndDetails> {}
+
+/// Handles [GestureDragCancelCallback] events
+class DragCancelStreamCallback extends VoidStreamCallback {}
+
+/// Handles [GestureLongPressCallback] events
+class LongPressStreamCallback extends VoidStreamCallback {}
+
+/// Handles [GestureMultiTapDownCallback] events
+class MultiTapDownStreamCallback extends StreamCallback<MultiTapDownEvent> {
+  call(int pointer, TapDownDetails details) =>
+      streamController.add(new MultiTapDownEvent(pointer, details));
+}
+
+class MultiTapDownEvent {
+  final int pointer;
+  final TapDownDetails details;
+
+  MultiTapDownEvent(this.pointer, this.details);
+}
+
+/// Handles [GestureMultiTapUpCallback] events
+class MultiTapUpStreamCallback extends StreamCallback<MultiTapUpEvent> {
+  call(int pointer, TapUpDetails details) =>
+      streamController.add(new MultiTapUpEvent(pointer, details));
+}
+
+class MultiTapUpEvent {
+  final int pointer;
+  final TapUpDetails details;
+
+  MultiTapUpEvent(this.pointer, this.details);
+}
+
+/// Handles [GestureMultiTapCallback] events
+class MultiTapStreamCallback extends ValueStreamCallback<int> {}
+
+/// Handles [GestureMultiTapCancelCallback] events
+class MultiTapCancelStreamCallback extends ValueStreamCallback<int> {}
+
+/// Handles [GestureScaleStartCallback] events
+class ScaleStartStreamCallback extends ValueStreamCallback<ScaleStartDetails> {}
+
+/// Handles [GestureScaleUpdateCallback] events
+class ScaleUpdateStreamCallback
+    extends ValueStreamCallback<ScaleUpdateDetails> {}
+
+/// Handles [GestureScaleEndCallback] events
+class ScaleEndStreamCallback extends ValueStreamCallback<ScaleEndDetails> {}
+
+/// Handles [GestureTapDownCallback] events
+class TapDownStreamCallback extends ValueStreamCallback<TapDownDetails> {}
+
+/// Handles [GestureTapUpCallback] events
+class TapUpStreamCallback extends ValueStreamCallback<TapUpDetails> {}
+
+/// Handles [GestureTapCallback] events
+class TapStreamCallback extends VoidStreamCallback {}
+
+/// Handles [GestureTapCancelCallback] events
+class TapCancelStreamCallback extends VoidStreamCallback {}
+
+/// Handles [DismissDirectionCallback] events
+class DismissDirectionStreamCallback
+    extends ValueStreamCallback<DismissDirection> {}
+
+/// Handles [DraggableCanceledCallback] events
+class DraggableCanceledStreamCallback
+    extends StreamCallback<DraggableCanceledEvent> {
+  call(Velocity velocity, Offset offset) =>
+      streamController.add(new DraggableCanceledEvent(velocity, offset));
+}
+
+class DraggableCanceledEvent {
+  final Velocity velocity;
+  final Offset offset;
+
+  DraggableCanceledEvent(this.velocity, this.offset);
+}

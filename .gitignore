@@ -6,6 +6,11 @@ packages
 # Remove the following pattern if you wish to check in your lock file
 pubspec.lock
 
+.DS_Store
+.atom/
+.idea
+ios/.generated/
+
 # Files created by dart2js
 *.dart.js
 *.part.js
@@ -17,7 +22,6 @@ pubspec.lock
 doc/api/
 
 # JetBrains IDEs
-.idea/
 *.iml
 *.ipr
 *.iws
