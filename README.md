@@ -3,7 +3,7 @@
 Connect Flutter Widgets to Dart Streams! In Flutter, there's a wonderful distinction between `StatefulWidgets` and `StatelessWidgets`. When used well, `StatefulWidgets` provide a convenient way to encapsulate your data coordination needs in one component, and keep the UI rendering in various "passive" `StatelessWidgets`. In React terms, this is often called the "Smart Component / Dumb Component" pattern, and is similar to the "Active Presenter / Passive View" pattern in MVP.
 
 However, what if you've got slightly more advanced data needs, such as loading
-data from a database or web server? Furthermore, you may need to listen to a continuous stream of updates from a Store or EventBus. Finally, you may require more powerful control over your event-handling, such as being `debounce` or `buffer` the events passing through an event-handler. For these use cases, Streams provide a great way to manage the events and data needs of a `StatefulWidget`!
+data from a database or web server? Furthermore, you may need to listen to a continuous stream of updates from a Store or EventBus. Finally, you may require more powerful control over your event-handling, such as being able to `debounce` or `buffer` the events passing through an event-handler. For these use cases, Streams provide a great way to manage the events and data needs of a `StatefulWidget`!
 
 In general: what if we could combine the power of `StatefulWidgets` with the elegance of `Streams`? That's just what this library aims to do.
 
@@ -97,10 +97,10 @@ In order to handle events, rather than using a normal `Callback`, we'll use a `S
 
 ```dart
 class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
-  // Normal state that can be passed into this component
+  // Normal props can be passed into this Widget, just like usual
   final String title;
 
-  StreamWidgetDemo(this.title, {Key key}) : super(new StreamWidgetDemoModel(0, () {}), key: key);
+  StreamWidgetDemo(this.title, {Key key}) : super(key: key);
 
   /// When the component is initially built, createStream will be called and the
   /// resulting stream will be listened to. When any new events are added to
@@ -125,8 +125,6 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
   // The latest value of the StreamWidgetDemoModel from the created stream is
   // passed into the this version of the build function!
   Widget build(BuildContext context, StreamWidgetDemoModel model) {
-    print("Build: ${model}");
-
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(title),
@@ -139,13 +137,25 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        // Use the `StreamCallback` here to wire up the events to the Stream.
+      // Use the `StreamCallback` here to wire up the events to the Stream.
         onPressed: model.onFabPressed,
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ),
     );
   }
+
+  // Because Streams are async in nature, it's common for the model to be
+  // unavailable when it's first rendered. In order to handle the case when
+  // data is loading, or the Stream is async, StreamWidget provides a hook
+  // to handle exactly how to handle this case.
+  //
+  // In our case, we'll simply provide a default Model to get our app
+  // kickstarted, then the stream Will take over as the first event is sent
+  // down.
+  @override
+  Widget buildLoading(BuildContext context) =>
+      build(context, new StreamWidgetDemoModel(0, () {}));
 }
 
 class StreamWidgetDemoModel {

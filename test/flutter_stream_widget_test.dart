@@ -5,14 +5,15 @@ import 'test_stream_widget.dart';
 
 void main() {
   group('StreamWidget', () {
-    testWidgets('takes an optional initial value', (WidgetTester tester) async {
+    testWidgets('runs buildLoading before any data has been delivered',
+        (WidgetTester tester) async {
       StreamController<String> streamController =
-          new StreamController.broadcast(sync: true);
-      var widget = new TestStreamWidget("initial", streamController.stream);
+          new StreamController.broadcast();
+      var widget = new TestStreamWidget("init", streamController.stream);
 
       await tester.pumpWidget(widget);
 
-      expect(widget.currentState, equals("initial"));
+      expect(widget.lifeCycle, equals(TestStreamWidget.buildLoadingState));
     });
 
     testWidgets('subscribes to the latest state', (WidgetTester tester) async {

@@ -24,7 +24,7 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
   // Normal state that can be passed into this component
   final String title;
 
-  StreamWidgetDemo(this.title, {Key key}) : super(new StreamWidgetDemoModel(0, () {}), key: key);
+  StreamWidgetDemo(this.title, {Key key}) : super(key: key);
 
   /// When the component is initially built, createStream will be called and the
   /// resulting stream will be listened to. When any new events are added to
@@ -49,8 +49,6 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
   // The latest value of the StreamWidgetDemoModel from the created stream is
   // passed into the this version of the build function!
   Widget build(BuildContext context, StreamWidgetDemoModel model) {
-    print("Build: ${model}");
-
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(title),
@@ -63,13 +61,25 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        // Use the `StreamCallback` here to wire up the events to the Stream.
+      // Use the `StreamCallback` here to wire up the events to the Stream.
         onPressed: model.onFabPressed,
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ),
     );
   }
+
+  // Because Streams are async in nature, it's common for the model to be
+  // unavailable when it's first rendered. In order to handle the case when
+  // data is loading, or the Stream is async, StreamWidget provides a hook
+  // to handle exactly how to handle this case.
+  //
+  // In our case, we'll simply provide a default Model to get our app
+  // kickstarted, then the stream Will take over as the first event is sent
+  // down.
+  @override
+  Widget buildLoading(BuildContext context) =>
+      build(context, new StreamWidgetDemoModel(0, () {}));
 }
 
 class StreamWidgetDemoModel {
