@@ -38,7 +38,7 @@ void main() {
 
     testWidgets('unsubscribes on destroy', (WidgetTester tester) async {
       final streamController =
-          new StreamController<String>.broadcast(sync: true);
+      new StreamController<String>.broadcast(sync: true);
       final widget = new TestStreamWidget("", streamController.stream);
 
       await tester.pumpWidget(widget);

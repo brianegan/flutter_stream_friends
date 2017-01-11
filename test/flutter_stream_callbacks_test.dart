@@ -154,5 +154,17 @@ void main() {
         () => expect(
             new DraggableCanceledStreamCallback() is DraggableCanceledCallback,
             isTrue));
+
+    test(
+        'ValueChangedStreamCallback should be a generic ValueChanged<T>',
+            () => expect(
+            new ValueChangedStreamCallback<String>() is ValueChanged<String>,
+            isTrue));
+
+    test(
+        'InputValueStreamCallback should be a ValueChanged<InputValue>',
+            () => expect(
+            new InputValueStreamCallback() is ValueChanged<InputValue>,
+            isTrue));
   });
 }

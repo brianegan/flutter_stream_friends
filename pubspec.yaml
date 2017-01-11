@@ -1,6 +1,6 @@
 name: flutter_stream_friends
 description: Flutter's great. Streams are great. Let's mingle.
-version: 0.3.0
+version: 0.4.0
 author: brian.egan <brian@brianegan.com>
 homepage: https://gitlab.com/brianegan/flutter_stream_friends
 
@@ -8,7 +8,7 @@ environment:
   sdk: '>=1.0.0 <2.0.0'
 
 dependencies:
-  meta: 1.0.4
+  meta: '>=1.0.4 <2.0.0'
   flutter:
     sdk: flutter
 
