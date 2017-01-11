@@ -3,9 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_stream_friends/flutter_stream_friends.dart';
 
 class TestStreamWidget extends StreamWidget<String> {
-  static const init = "init";
-  static const buildState = "build";
-  static const buildLoadingState = "buildLoading";
+  static const String init = "init";
+  static const String buildState = "build";
+  static const String buildLoadingState = "buildLoading";
 
   final Stream<String> testStream;
   String currentState = "";
