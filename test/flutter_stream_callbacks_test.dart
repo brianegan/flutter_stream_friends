@@ -8,9 +8,9 @@ void main() {
   group('StreamCallbacks', () {
     testWidgets('should act as a stream and callback',
         (WidgetTester tester) async {
-      var streamCallback = new TapStreamCallback();
-      var key = new Key("test");
-      var widget = new GestureDetector(key: key, onTap: streamCallback);
+      final streamCallback = new TapStreamCallback();
+      final key = new Key("test");
+      final widget = new GestureDetector(key: key, onTap: streamCallback);
       var wasTapped = false;
 
       await tester.pumpWidget(widget);
@@ -24,14 +24,14 @@ void main() {
 
     testWidgets('should act as a stream and callback with a value',
         (WidgetTester tester) async {
-      var streamCallback = new TapDownStreamCallback();
-      var key = new Key("test");
-      var widget = new GestureDetector(key: key, onTapDown: streamCallback);
+      final streamCallback = new TapDownStreamCallback();
+      final key = new Key("test");
+      final widget = new GestureDetector(key: key, onTapDown: streamCallback);
       Point position;
 
       await tester.pumpWidget(widget);
 
-      streamCallback.listen((tap) => position = tap.globalPosition);
+      streamCallback.listen((TapDownDetails tap) => position = tap.globalPosition);
 
       await tester.tap(find.byKey(key));
 

@@ -10,14 +10,22 @@ import 'package:flutter/material.dart';
 /// Stream of those events. This is useful when creating applications that rely
 /// more heavily on stream-based architectures.
 abstract class StreamCallback<T> extends Stream<T> implements Function {
+  /// When creating StreamCallbacks, you can simply implement the correct `call`
+  /// method for the given callback you want to support, forwarding all event
+  /// data into this streamController via `streamController.add(T)`
   final StreamController<T> streamController =
-      new StreamController.broadcast(sync: true);
+      new StreamController<T>.broadcast(sync: true);
 
   @override
   StreamSubscription<T> listen(void onData(T event),
       {Function onError, void onDone(), bool cancelOnError}) {
-    return streamController.stream.listen(onData,
-        onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+    return streamController.stream.listen(onData, onError: onError, onDone: () {
+      try {
+        onDone();
+      } finally {
+        streamController.close();
+      }
+    }, cancelOnError: cancelOnError);
   }
 }
 
@@ -27,7 +35,7 @@ abstract class StreamCallback<T> extends Stream<T> implements Function {
 /// the same way you can create a callback with no parameters. Therefore, the
 /// Null class is used, and should be ignored.
 class VoidStreamCallback extends StreamCallback<Null> {
-  call() => streamController.add(null);
+  void call() => streamController.add(null);
 }
 
 /// The base single-value implementation
@@ -35,7 +43,7 @@ class VoidStreamCallback extends StreamCallback<Null> {
 /// Extend this class with a simple type parameter to create a new
 /// StreamCallback if the callback consists of only a single value.
 class ValueStreamCallback<T> extends StreamCallback<T> {
-  call(T value) => streamController.add(value);
+  void call(T value) => streamController.add(value);
 }
 
 /// Handles [GestureDragDownCallback] events
@@ -58,10 +66,11 @@ class LongPressStreamCallback extends VoidStreamCallback {}
 
 /// Handles [GestureMultiTapDownCallback] events
 class MultiTapDownStreamCallback extends StreamCallback<MultiTapDownEvent> {
-  call(int pointer, TapDownDetails details) =>
+  void call(int pointer, TapDownDetails details) =>
       streamController.add(new MultiTapDownEvent(pointer, details));
 }
 
+/// Encapsulates all parameters of the [GestureMultiTapDownCallback] event
 class MultiTapDownEvent {
   final int pointer;
   final TapDownDetails details;
@@ -71,10 +80,11 @@ class MultiTapDownEvent {
 
 /// Handles [GestureMultiTapUpCallback] events
 class MultiTapUpStreamCallback extends StreamCallback<MultiTapUpEvent> {
-  call(int pointer, TapUpDetails details) =>
+  void call(int pointer, TapUpDetails details) =>
       streamController.add(new MultiTapUpEvent(pointer, details));
 }
 
+/// Encapsulates all parameters of the [GestureMultiTapUpCallback] event
 class MultiTapUpEvent {
   final int pointer;
   final TapUpDetails details;
@@ -117,10 +127,11 @@ class DismissDirectionStreamCallback
 /// Handles [DraggableCanceledCallback] events
 class DraggableCanceledStreamCallback
     extends StreamCallback<DraggableCanceledEvent> {
-  call(Velocity velocity, Offset offset) =>
+  void call(Velocity velocity, Offset offset) =>
       streamController.add(new DraggableCanceledEvent(velocity, offset));
 }
 
+/// Encapsulates all parameters of the [DraggableCanceledCallback] event
 class DraggableCanceledEvent {
   final Velocity velocity;
   final Offset offset;

@@ -7,20 +7,22 @@ void main() {
   group('StreamWidget', () {
     testWidgets('runs buildLoading before any data has been delivered',
         (WidgetTester tester) async {
-      StreamController<String> streamController =
-          new StreamController.broadcast();
-      var widget = new TestStreamWidget("init", streamController.stream);
+      final streamController =
+          new StreamController<String>.broadcast();
+      final widget = new TestStreamWidget("init", streamController.stream);
 
       await tester.pumpWidget(widget);
+
+      await streamController.close();
 
       expect(widget.lifeCycle, equals(TestStreamWidget.buildLoadingState));
     });
 
     testWidgets('subscribes to the latest state', (WidgetTester tester) async {
-      StreamController<String> streamController =
-          new StreamController.broadcast(sync: true);
-      var widget = new TestStreamWidget("initial", streamController.stream);
-      var expected = "test";
+      final streamController =
+          new StreamController<String>.broadcast(sync: true);
+      final widget = new TestStreamWidget("initial", streamController.stream);
+      final expected = "test";
 
       await tester.pumpWidget(widget);
 
@@ -29,13 +31,15 @@ void main() {
       streamController.add(expected);
       await tester.pumpWidget(widget);
 
+      await streamController.close();
+
       expect(widget.currentState, equals(expected));
     });
 
     testWidgets('unsubscribes on destroy', (WidgetTester tester) async {
-      StreamController<String> streamController =
-          new StreamController.broadcast(sync: true);
-      var widget = new TestStreamWidget("", streamController.stream);
+      final streamController =
+          new StreamController<String>.broadcast(sync: true);
+      final widget = new TestStreamWidget("", streamController.stream);
 
       await tester.pumpWidget(widget);
       expect(streamController.hasListener, equals(true));
@@ -43,6 +47,8 @@ void main() {
       // Create a new Widget tree, which causes the test Widget to be disposed.
       await tester.pumpWidget(new Container());
       expect(streamController.hasListener, equals(false));
+
+      await streamController.close();
     });
   });
 }

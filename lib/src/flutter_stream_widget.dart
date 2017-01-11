@@ -40,6 +40,12 @@ abstract class StreamWidget<WidgetModel> extends StatefulWidget {
     return widgetModel == null;
   }
 
+  /// Create a stream that will deliver the necessary data for the Widget
+  /// 
+  /// Instead of creating local state variables and managing those with
+  /// individual handlers and setters, simply create a stream that continuously
+  /// delivers new data to your Widget. When new data is delivered, the Widget
+  /// will be rebuilt.
   Stream<WidgetModel> createStream();
 
   @override
@@ -47,15 +53,16 @@ abstract class StreamWidget<WidgetModel> extends StatefulWidget {
       new StreamWidgetState<WidgetModel>();
 }
 
+/// The State for a StreamWidget
+///
+///
 class StreamWidgetState<WidgetModel> extends State<StreamWidget<WidgetModel>> {
   WidgetModel _widgetModel;
-  StreamSubscription<WidgetModel> subscription;
-
-  StreamWidgetState();
+  StreamSubscription<WidgetModel> _subscription;
 
   @override
   void initState() {
-    subscription = config.createStream().distinct().listen((latestModel) {
+    _subscription = config.createStream().distinct().listen((WidgetModel latestModel) {
       this.setState(() {
         _widgetModel = latestModel;
       });
@@ -66,7 +73,7 @@ class StreamWidgetState<WidgetModel> extends State<StreamWidget<WidgetModel>> {
 
   @override
   void dispose() {
-    subscription.cancel();
+    _subscription.cancel();
 
     super.dispose();
   }
