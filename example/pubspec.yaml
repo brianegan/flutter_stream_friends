@@ -3,6 +3,5 @@ description: A demo of the flutter_stream_friends functionality
 dependencies:
   flutter:
     sdk: flutter
-  flutter_stream_friends:
-    path: ../
+  flutter_stream_friends: 0.4.0
   rxdart: 0.4.8
