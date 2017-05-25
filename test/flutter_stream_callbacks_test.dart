@@ -27,11 +27,12 @@ void main() {
       final streamCallback = new TapDownStreamCallback();
       final key = new Key("test");
       final widget = new GestureDetector(key: key, onTapDown: streamCallback);
-      Point position;
+      Offset position;
 
       await tester.pumpWidget(widget);
 
-      streamCallback.listen((TapDownDetails tap) => position = tap.globalPosition);
+      streamCallback
+          .listen((TapDownDetails tap) => position = tap.globalPosition);
 
       await tester.tap(find.byKey(key));
 
@@ -157,14 +158,8 @@ void main() {
 
     test(
         'ValueChangedStreamCallback should be a generic ValueChanged<T>',
-            () => expect(
+        () => expect(
             new ValueChangedStreamCallback<String>() is ValueChanged<String>,
-            isTrue));
-
-    test(
-        'InputValueStreamCallback should be a ValueChanged<InputValue>',
-            () => expect(
-            new InputValueStreamCallback() is ValueChanged<InputValue>,
             isTrue));
   });
 }

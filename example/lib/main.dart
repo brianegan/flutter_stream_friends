@@ -21,6 +21,9 @@ class MyApp extends StatelessWidget {
 }
 
 class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
+  static int get increment => 1;
+  static int get startingValue => 0;
+
   // Normal state that can be passed into this component
   final String title;
 
@@ -37,10 +40,13 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
     // the build method, it will begin emitting events!
     var onFabPressed = new VoidStreamCallback();
 
-    return observable(onFabPressed) // Every time the FAB is clicked
-        .map((_) => 1) // Emit the value of 1
-        .scan((int a, int b, int i) => a + b, 0) // Add that 1 to the total
-        .startWith([0]).map((int count) {
+    return new Observable(onFabPressed) // Every time the FAB is clicked
+        .map((_) => increment) // Emit the value of inc (1 in this case)
+        .scan(
+            (int a, int b, int i) => a + b, // Add that 1 to the total
+            startingValue)
+        .startWith(startingValue)
+        .map((int count) {
       // Convert the latest count and the event handler into the Widget Model
       return new StreamWidgetDemoModel(count, onFabPressed);
     });
@@ -61,7 +67,7 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-      // Use the `StreamCallback` here to wire up the events to the Stream.
+        // Use the `StreamCallback` here to wire up the events to the Stream.
         onPressed: model.onFabPressed,
         tooltip: 'Increment',
         child: new Icon(Icons.add),

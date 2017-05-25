@@ -143,8 +143,3 @@ class DraggableCanceledEvent {
 class ValueChangedStreamCallback<T> extends StreamCallback<T> {
   void call(T value) => streamController.add(value);
 }
-
-/// Convenience Function to handle [ValueChanged<InputValue>]
-class InputValueStreamCallback extends StreamCallback<InputValue> {
-  void call(InputValue value) => streamController.add(value);
-}

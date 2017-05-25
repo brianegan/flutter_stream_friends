@@ -13,7 +13,7 @@ abstract class StreamWidget<WidgetModel> extends StatefulWidget {
   /// of the [WidgetModel].
   Widget build(BuildContext context, WidgetModel widgetModel);
 
-  /// If you're working with an async stream, the first time your Widget builds,
+  /// If you're working with an async str`eam, the first time your Widget builds,
   /// the WidgetModel will be empty! Therefore, you can build a loading Widget!
   ///
   /// If the operation is going to take a long time to complete, you could
@@ -41,7 +41,7 @@ abstract class StreamWidget<WidgetModel> extends StatefulWidget {
   }
 
   /// Create a stream that will deliver the necessary data for the Widget
-  /// 
+  ///
   /// Instead of creating local state variables and managing those with
   /// individual handlers and setters, simply create a stream that continuously
   /// delivers new data to your Widget. When new data is delivered, the Widget
@@ -62,7 +62,8 @@ class StreamWidgetState<WidgetModel> extends State<StreamWidget<WidgetModel>> {
 
   @override
   void initState() {
-    _subscription = config.createStream().distinct().listen((WidgetModel latestModel) {
+    _subscription =
+        widget.createStream().distinct().listen((WidgetModel latestModel) {
       this.setState(() {
         _widgetModel = latestModel;
       });
@@ -79,7 +80,7 @@ class StreamWidgetState<WidgetModel> extends State<StreamWidget<WidgetModel>> {
   }
 
   @override
-  Widget build(BuildContext context) => config.isLoading(_widgetModel)
-      ? config.buildLoading(context)
-      : config.build(context, _widgetModel);
+  Widget build(BuildContext context) => widget.isLoading(_widgetModel)
+      ? widget.buildLoading(context)
+      : widget.build(context, _widgetModel);
 }

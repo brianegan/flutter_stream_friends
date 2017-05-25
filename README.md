@@ -113,10 +113,12 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
     // the build method, it will begin emitting events!
     var onFabPressed = new VoidStreamCallback();
 
-    return observable(onFabPressed) // Every time the FAB is clicked
+    // Using RxDart to add some extra functionality to the Stream class
+    return new Observable(onFabPressed) // Every time the FAB is clicked
         .map((_) => 1) // Emit the value of 1
-        .scan((int a, int b, int i) => a + b, 0) // Add that 1 to the total
-        .startWith([0]).map((int count) {
+        .scan((total, one, int index) => total + one, 0) // Add that 1 to the total using an accumulator function
+        .startWith(0) // The original item emitted for the initial render should just be 0
+        .map((int count) {
       // Convert the latest count and the event handler into the Widget Model
       return new StreamWidgetDemoModel(count, onFabPressed);
     });
@@ -144,18 +146,6 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
       ),
     );
   }
-
-  // Because Streams are async in nature, it's common for the model to be
-  // unavailable when it's first rendered. In order to handle the case when
-  // data is loading, or the Stream is async, StreamWidget provides a hook
-  // to handle exactly how to handle this case.
-  //
-  // In our case, we'll simply provide a default Model to get our app
-  // kickstarted, then the stream Will take over as the first event is sent
-  // down.
-  @override
-  Widget buildLoading(BuildContext context) =>
-      build(context, new StreamWidgetDemoModel(0, () {}));
 }
 
 class StreamWidgetDemoModel {
@@ -190,9 +180,12 @@ class StreamWidgetDemoModel {
 
 ## Why would you do this madness!?
 
+Well, it makes your state management fundamentally reactive! That means your Widgets can stay up to date with a variety
+of data sources that emit state changes (think Firebase). For example:
+
   - You may have more complex data needs, such as:
-    - calling a local database, file system, or web service
-    - keep up to date with the latest state from a data Store, such as a dart_redux Store.
+    - calling a local database, file system, or web service when your Widget initializes
+    - Keeping your Widgets up to date with a reactive data source, such as a Firebase Database or Redux Store 
   - No longer need both a `Widget` and separate `State` class
   - No longer make manual calls to `setState`. Just set up your stream and the `StreamWidget` handles the rest.
   - You can use the power of observables to reduce the number redraws your UI performs. By using `Stream#distinct` under the hood, setState will only be called when data is truly fresh.
