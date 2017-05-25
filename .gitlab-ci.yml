@@ -1,4 +1,4 @@
-image: brianegan/flutter:v3
+image: brianegan/flutter:v4
 
 stages:
   - test
