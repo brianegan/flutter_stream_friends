@@ -8,56 +8,33 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  static String appTitle = "Flutter Stream Friends";
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: appTitle,
       theme: new ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.purple,
       ),
-      home: new StreamWidgetDemo('Reactive Flutter Demo'),
+      home: new StreamBuilder(
+          stream: new CounterScreenStream(appTitle),
+          builder: (context, snapshot) => buildHome(
+              context,
+              snapshot.hasData
+                  // If our stream has delivered data, build our Widget properly
+                  ? snapshot.data
+                  // If not, we pass through a dummy model to kick things off
+                  : new CounterScreenModel(0, () {}, appTitle))),
     );
   }
-}
 
-class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
-  static int get increment => 1;
-  static int get startingValue => 0;
-
-  // Normal state that can be passed into this component
-  final String title;
-
-  StreamWidgetDemo(this.title, {Key key}) : super(key: key);
-
-  /// When the component is initially built, createStream will be called and the
-  /// resulting stream will be listened to. When any new events are added to
-  /// the stream, the `Widget` will call `setState` with the value of the event.
-  @override
-  Stream<StreamWidgetDemoModel> createStream() {
-    // Here, we create a StreamCallback. This acts as both a stream and
-    // callback. This will be used as a stream informing us when the button has
-    // been tapped, and as the event handler on the FAB. Once set on the FAB in
-    // the build method, it will begin emitting events!
-    var onFabPressed = new VoidStreamCallback();
-
-    return new Observable(onFabPressed) // Every time the FAB is clicked
-        .map((_) => increment) // Emit the value of inc (1 in this case)
-        .scan(
-            (int a, int b, int i) => a + b, // Add that 1 to the total
-            startingValue)
-        .startWith(startingValue)
-        .map((int count) {
-      // Convert the latest count and the event handler into the Widget Model
-      return new StreamWidgetDemoModel(count, onFabPressed);
-    });
-  }
-
-  // The latest value of the StreamWidgetDemoModel from the created stream is
+  // The latest value of the CounterScreenModel from the CounterScreenStream is
   // passed into the this version of the build function!
-  Widget build(BuildContext context, StreamWidgetDemoModel model) {
+  Widget buildHome(BuildContext context, CounterScreenModel model) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(title),
+        title: new Text(model.title),
       ),
       body: new Center(
         child: new Text(
@@ -74,45 +51,65 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
       ),
     );
   }
-
-  // Because Streams are async in nature, it's common for the model to be
-  // unavailable when it's first rendered. In order to handle the case when
-  // data is loading, or the Stream is async, StreamWidget provides a hook
-  // to handle exactly how to handle this case.
-  //
-  // In our case, we'll simply provide a default Model to get our app
-  // kickstarted, then the stream Will take over as the first event is sent
-  // down.
-  @override
-  Widget buildLoading(BuildContext context) =>
-      build(context, new StreamWidgetDemoModel(0, () {}));
 }
 
-class StreamWidgetDemoModel {
+class CounterScreenStream extends Stream<CounterScreenModel> {
+  final Stream<CounterScreenModel> _stream;
+
+  CounterScreenStream(String title,
+      [VoidStreamCallback onFabPressed, int initialValue = 0])
+      : this._stream = createStream(
+            title, onFabPressed ?? new VoidStreamCallback(), initialValue);
+
+  @override
+  StreamSubscription<CounterScreenModel> listen(
+          void onData(CounterScreenModel event),
+          {Function onError,
+          void onDone(),
+          bool cancelOnError}) =>
+      _stream.listen(onData,
+          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+
+  // The method we use to create the stream that will continually deliver data
+  // to the `buildHome` method.
+  static Stream<CounterScreenModel> createStream(
+      String title, VoidStreamCallback onFabPressed, int initialValue) {
+    return new Observable(onFabPressed) // Every time the FAB is clicked
+        .map((_) => 1) // Emit the value of 1
+        .scan(
+            (int a, int b, int i) => a + b, // Add that 1 to the total
+            initialValue)
+        // Before the button is clicked, kick everything off by emitting 0
+        .startWith(initialValue)
+        // Convert the latest count and the event handler into the Widget Model
+        .map((int count) => new CounterScreenModel(count, onFabPressed, title));
+  }
+}
+
+class CounterScreenModel {
+  final String title;
   final int count;
   final VoidCallback onFabPressed;
 
-  StreamWidgetDemoModel(this.count, this.onFabPressed);
+  CounterScreenModel(this.count, this.onFabPressed, this.title);
 
   // If you've got a custom data model for your widget, it's best to implement
   // the == method in order to take advantage the performance optimizations
   // offered by the `Streams#distinct()` method. This will ensure the Widget is
   // repainted only when the Model has truly changed.
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    return other is StreamWidgetDemoModel && this.count == other.count;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CounterScreenModel &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          count == other.count &&
+          onFabPressed == other.onFabPressed;
 
   @override
-  int get hashCode {
-    return count.hashCode;
-  }
+  int get hashCode => title.hashCode ^ count.hashCode ^ onFabPressed.hashCode;
 
   @override
-  String toString() {
-    return 'StreamWidgetDemoModel{count: $count, onFabPressed: $onFabPressed}';
-  }
+  String toString() =>
+      'StreamWidgetDemoModel{title: $title, count: $count, onFabPressed: $onFabPressed}';
 }

@@ -5,11 +5,11 @@ Connect Flutter Widgets to Dart Streams! In Flutter, there's a wonderful distinc
 However, what if you've got slightly more advanced data needs, such as loading
 data from a database or web server? Furthermore, you may need to listen to a continuous stream of updates from a Store or EventBus. Finally, you may require more powerful control over your event-handling, such as being able to `debounce` or `buffer` the events passing through an event-handler. For these use cases, Streams provide a great way to manage the events and data needs of a `StatefulWidget`!
 
-In general: what if we could combine the power of `StatefulWidgets` with the elegance of `Streams`? That's just what this library aims to do.
+In general: what if we could combine the power of `StatefulWidgets` with the elegance of `Streams`? That's just what this library aims to help with.
 
-## How they work
+## How it works
 
-In order to understand the concept, let's compare the default usage of `StatefulWidget` to a `StreamWidget`, the core `Widget` provided by this library.
+In order to understand the concept, let's compare the default usage of `StatefulWidget` to a `StreamBuilder` version. This library used to provide a `StreamWidget`, but we now recommend using the new `StreamBuilder` widget provided by the Flutter framework. 
 
 ### Original
  
@@ -85,51 +85,48 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 ```
 
-### StreamWidget version
+### StreamBuilder version
 
-Now, let's take a look at the version using streams! This code will produce the exact same UI, but the way it manages state is a bit different. Rather than relying on local state within a `State` object, using handlers to update the local widget state, we use the power of the Dart `Stream` to continually deliver new information to the Widget's `build` method.
+Now, let's take a look at the version using streams! This code will produce the exact same UI, but the way it manages state is a bit different. Rather than relying on local state within a `State` object, using handlers to `setState`, we use the power of the Dart `Stream` to continually listen to and deliver new information to the Widget in response to button presses!
 
-When the component is created, rather than `createState`, the`createStream` method will be called. Within the `createStream` method, we build up a stream that can continuously deliver new information to the Widget. Any time the stream emits new items, `setState` will automatically be called with the latest value.
+How it works:
 
-In order to handle events, rather than using a normal `Callback`, we'll use a `StreamCallback`. This is a set of classes that act as event handlers for different types of Flutter callbacks, such as Tap or Drag events. They also act as a `Stream`: you can `listen` to the `StreamCallback` to receive the latest value from the event handler it's wired up to.
- 
- Now that we've chatted a bit about how it works, let's see the code!
+  - Create a Stateless widget that contains a `StreamBuilder`
+  - The `StreamBuilder` takes a `stream` parameter. Instead of creating a `State` object to manage the counter state, we'll create a `Stream` instead that will deliver the current count.
+  - The `Stream` we build contains a `VoidStreamCallback` that acts as both the `onPressed` handler on the `floatingActionButton` and as the stream we'll listen to so we know when the button is pressed.
+  - Then, as the button is pressed, the Stream will deliver the latest value to the 
+
+Now that we've chatted a bit about how it works, let's see the code!
 
 ```dart
-class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
-  // Normal props can be passed into this Widget, just like usual
-  final String title;
+class MyApp extends StatelessWidget {
+  static String appTitle = "Flutter Stream Friends";
 
-  StreamWidgetDemo(this.title, {Key key}) : super(key: key);
-
-  /// When the component is initially built, createStream will be called and the
-  /// resulting stream will be listened to. When any new events are added to
-  /// the stream, the `Widget` will call `setState` with the value of the event.
   @override
-  Stream<StreamWidgetDemoModel> createStream() {
-    // Here, we create a StreamCallback. This acts as both a stream and
-    // callback. This will be used as a stream informing us when the button has
-    // been tapped, and as the event handler on the FAB. Once set on the FAB in
-    // the build method, it will begin emitting events!
-    var onFabPressed = new VoidStreamCallback();
-
-    // Using RxDart to add some extra functionality to the Stream class
-    return new Observable(onFabPressed) // Every time the FAB is clicked
-        .map((_) => 1) // Emit the value of 1
-        .scan((total, one, int index) => total + one, 0) // Add that 1 to the total using an accumulator function
-        .startWith(0) // The original item emitted for the initial render should just be 0
-        .map((int count) {
-      // Convert the latest count and the event handler into the Widget Model
-      return new StreamWidgetDemoModel(count, onFabPressed);
-    });
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: appTitle,
+      theme: new ThemeData(
+        primarySwatch: Colors.purple,
+      ),
+      home: new StreamBuilder(
+          stream: new CounterScreenStream(appTitle),
+          builder: (context, snapshot) => buildHome(
+              context,
+              snapshot.hasData
+                  // If our stream has delivered data, build our Widget properly
+                  ? snapshot.data
+                  // If not, we pass through a dummy model to kick things off
+                  : new CounterScreenModel(0, () {}, appTitle))),
+    );
   }
 
-  // The latest value of the StreamWidgetDemoModel from the created stream is
+  // The latest value of the CounterScreenModel from the CounterScreenStream is
   // passed into the this version of the build function!
-  Widget build(BuildContext context, StreamWidgetDemoModel model) {
+  Widget buildHome(BuildContext context, CounterScreenModel model) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(title),
+        title: new Text(model.title),
       ),
       body: new Center(
         child: new Text(
@@ -139,7 +136,7 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-      // Use the `StreamCallback` here to wire up the events to the Stream.
+        // Use the `StreamCallback` here to wire up the events to the Stream.
         onPressed: model.onFabPressed,
         tooltip: 'Increment',
         child: new Icon(Icons.add),
@@ -148,48 +145,83 @@ class StreamWidgetDemo extends StreamWidget<StreamWidgetDemoModel> {
   }
 }
 
-class StreamWidgetDemoModel {
+class CounterScreenStream extends Stream<CounterScreenModel> {
+  final Stream<CounterScreenModel> _stream;
+
+  CounterScreenStream(String title,
+      [VoidStreamCallback onFabPressed, int initialValue = 0])
+      : this._stream = createStream(
+            title, onFabPressed ?? new VoidStreamCallback(), initialValue);
+
+  @override
+  StreamSubscription<CounterScreenModel> listen(
+          void onData(CounterScreenModel event),
+          {Function onError,
+          void onDone(),
+          bool cancelOnError}) =>
+      _stream.listen(onData,
+          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+
+  // The method we use to create the stream that will continually deliver data
+  // to the `buildHome` method.
+  static Stream<CounterScreenModel> createStream(
+      String title, VoidStreamCallback onFabPressed, int initialValue) {
+    return new Observable(onFabPressed) // Every time the FAB is clicked
+        .map((_) => 1) // Emit the value of 1
+        .scan(
+            (int a, int b, int i) => a + b, // Add that 1 to the total
+            initialValue)
+        // Before the button is clicked, kick everything off by emitting 0
+        .startWith(initialValue)
+        // Convert the latest count and the event handler into the Widget Model
+        .map((int count) => new CounterScreenModel(count, onFabPressed, title));
+  }
+}
+
+class CounterScreenModel {
+  final String title;
   final int count;
   final VoidCallback onFabPressed;
 
-  StreamWidgetDemoModel(this.count, this.onFabPressed);
+  CounterScreenModel(this.count, this.onFabPressed, this.title);
 
   // If you've got a custom data model for your widget, it's best to implement
   // the == method in order to take advantage the performance optimizations
   // offered by the `Streams#distinct()` method. This will ensure the Widget is
   // repainted only when the Model has truly changed.
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    return other is StreamWidgetDemoModel && this.count == other.count;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CounterScreenModel &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          count == other.count &&
+          onFabPressed == other.onFabPressed;
 
   @override
-  int get hashCode {
-    return count.hashCode;
-  }
+  int get hashCode => title.hashCode ^ count.hashCode ^ onFabPressed.hashCode;
 
   @override
-  String toString() {
-    return 'StreamWidgetDemoModel{count: $count, onFabPressed: $onFabPressed}';
-  }
+  String toString() =>
+      'CounterScreenModel{title: $title, count: $count, onFabPressed: $onFabPressed}';
 }
 ```
 
 ## Why would you do this madness!?
 
-Well, it makes your state management fundamentally reactive! That means your Widgets can stay up to date with a variety
-of data sources that emit state changes (think Firebase). For example:
+You might ask: Why would you do this? The second version is so much more code! And you're right, for a super simple example, such as a counter, this is indeed much more code.
+
+However, there are some important advantages: First, separation of concerns. The state logic is now properly encapsulated as a Stream is easily testable. This should not be undervalued.
+
+Second, it makes your state management fundamentally reactive! That means your Widgets can stay up to date with a variety
+of data sources that emit state changes (think Firebase or WebSockets or Redux). For example:
 
   - You may have more complex data needs, such as:
     - calling a local database, file system, or web service when your Widget initializes
-    - Keeping your Widgets up to date with a reactive data source, such as a Firebase Database or Redux Store 
-  - No longer need both a `Widget` and separate `State` class
+    - Keeping your Widgets up to date with a reactive data source, such as a Firebase Database, WebSocket, or Redux Store 
   - No longer make manual calls to `setState`. Just set up your stream and the `StreamWidget` handles the rest.
-  - You can use the power of observables to reduce the number redraws your UI performs. By using `Stream#distinct` under the hood, setState will only be called when data is truly fresh.
-  - No need to worry about manually canceling any subscriptions.  
+  - You can use the power of Streams to reduce the number redraws your UI performs. By using `Stream#distinct` under the hood, setState will only be called when data is truly fresh.
+  - No need to worry about manually canceling any StreamSubscriptions.  
   - Helpful when you have more advanced event handling needs, such as needing to `debounce` or `buffer` the events.
   
 ## Examples
