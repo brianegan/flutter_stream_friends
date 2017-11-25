@@ -1,8 +1,0 @@
-image: brianegan/flutter:v4
-
-stages:
-  - test
-
-unit_test:
-  stage: test
-  script: flutter test

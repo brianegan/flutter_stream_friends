@@ -1,5 +1,7 @@
 # flutter_stream_friends
 
+[![Build Status](https://travis-ci.org/brianegan/flutter_stream_friends.svg?branch=master)](https://travis-ci.org/brianegan/flutter_stream_friends)  [![codecov](https://codecov.io/gh/brianegan/flutter_stream_friends/branch/master/graph/badge.svg)](https://codecov.io/gh/brianegan/flutter_redux)
+
 Connect Flutter Widgets to Dart Streams! In Flutter, there's a wonderful distinction between `StatefulWidgets` and `StatelessWidgets`. When used well, `StatefulWidgets` provide a convenient way to encapsulate your data coordination needs in one component, and keep the UI rendering in various "passive" `StatelessWidgets`. In React terms, this is often called the "Smart Component / Dumb Component" pattern, and is similar to the "Active Presenter / Passive View" pattern in MVP.
 
 However, what if you've got slightly more advanced data needs, such as loading

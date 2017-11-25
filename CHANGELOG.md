@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1
+
+  * Move to github
+
+## 0.6.0
+
+  * Updated the lib for compatibility with the latest version of Flutter 
+
 ## 0.5.0
 
   * Updated the lib for compatibility with the latest version of Flutter 

@@ -1,8 +1,8 @@
 name: flutter_stream_friends
-description: Flutter's great. Streams are great. Let's mingle.
-version: 0.6.0
+description: Flutter's great. Streams are great. Let's be friends.
+version: 0.6.1
 author: brian.egan <brian@brianegan.com>
-homepage: https://gitlab.com/brianegan/flutter_stream_friends
+homepage: https://github.com/brianegan/flutter_stream_friends
 
 environment:
   sdk: '>=1.0.0 <2.0.0'
