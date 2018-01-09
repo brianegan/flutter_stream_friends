@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_stream_friends/flutter_stream_friends.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -159,7 +160,29 @@ void main() {
     test(
         'ValueChangedStreamCallback should be a generic ValueChanged<T>',
         () => expect(
-            new ValueChangedStreamCallback<String>() is ValueChanged<String>,
-            isTrue));
+              new ValueChangedStreamCallback<String>() is ValueChanged<String>,
+              isTrue,
+            ));
+
+    test('RefreshStreamCallback should be a generic RefreshCallback', () {
+      expect(
+        new RefreshStreamCallback() is RefreshCallback,
+        isTrue,
+      );
+    });
+
+    test('RefreshStreamCallback can be completed', () {
+      final callback = new RefreshStreamCallback();
+
+      callback.listen((completer) => completer.complete());
+
+      expect(callback(), completes);
+    });
+
+    test('RefreshStreamCallback is not completed by default', () {
+      final callback = new RefreshStreamCallback();
+
+      expect(callback(), doesNotComplete);
+    });
   });
 }

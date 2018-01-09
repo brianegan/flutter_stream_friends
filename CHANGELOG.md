@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2
+
+  * Add `RefreshStreamCallback`
+
 ## 0.6.1
 
   * Move to github
