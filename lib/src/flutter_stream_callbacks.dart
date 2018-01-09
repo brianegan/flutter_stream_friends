@@ -38,6 +38,26 @@ class VoidStreamCallback extends StreamCallback<Null> {
   void call() => streamController.add(null);
 }
 
+/// Handles [RefreshCallback] events
+///
+/// In order to use a `RefreshIndicator` widget, you must provide a
+/// `Future<Null>` to the `onRefresh` callback. When the `Future` completes,
+/// the indicator will disappear.
+///
+/// This callback creates a `Completer<Null>` every time it is called. The
+/// Completer is then emitted to any listener. You can then use
+/// `completer.complete()` to indicate your async operation is done, and the
+/// `RefreshIndicator` will be hidden.
+class RefreshStreamCallback extends StreamCallback<Completer<Null>> {
+  Future<Null> call() {
+    final completer = new Completer<Null>();
+
+    streamController.add(completer);
+
+    return completer.future;
+  }
+}
+
 /// The base single-value implementation
 ///
 /// Extend this class with a simple type parameter to create a new
