@@ -25,3 +25,5 @@ doc/api/
 *.iml
 *.ipr
 *.iws
+
+lcov.info

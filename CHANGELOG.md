@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0
+
+  * Automatically closes the `streamCotroller` when all subscriptions to a StreamCallback are cancelled
+  * Add `InfiniteScrollStream`. Emits events when a list is scrolled to the end so you can fetch more data!
+
 ## 0.6.2
 
   * Add `RefreshStreamCallback`

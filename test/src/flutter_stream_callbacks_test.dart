@@ -184,5 +184,15 @@ void main() {
 
       expect(callback(), doesNotComplete);
     });
+
+    test('StreamController is closed after subscriptions are cancelled', () {
+      final callback = new VoidStreamCallback();
+      final subscription = callback.listen((_) {});
+
+      subscription.cancel();
+
+      expect(callback.streamController.done, completes);
+      expect(() => callback(), throwsStateError);
+    });
   });
 }

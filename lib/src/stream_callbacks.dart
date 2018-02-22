@@ -17,15 +17,24 @@ abstract class StreamCallback<T> extends Stream<T> implements Function {
       new StreamController<T>.broadcast(sync: true);
 
   @override
-  StreamSubscription<T> listen(void onData(T event),
-      {Function onError, void onDone(), bool cancelOnError}) {
-    return streamController.stream.listen(onData, onError: onError, onDone: () {
-      try {
-        onDone();
-      } finally {
+  StreamSubscription<T> listen(
+    void onData(T event), {
+    Function onError,
+    void onDone(),
+    bool cancelOnError,
+  }) {
+    if (streamController.onCancel == null) {
+      streamController.onCancel = () {
         streamController.close();
-      }
-    }, cancelOnError: cancelOnError);
+      };
+    }
+
+    return streamController.stream.listen(
+      onData,
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
   }
 }
 
@@ -36,26 +45,6 @@ abstract class StreamCallback<T> extends Stream<T> implements Function {
 /// Null class is used, and should be ignored.
 class VoidStreamCallback extends StreamCallback<Null> {
   void call() => streamController.add(null);
-}
-
-/// Handles [RefreshCallback] events
-///
-/// In order to use a `RefreshIndicator` widget, you must provide a
-/// `Future<Null>` to the `onRefresh` callback. When the `Future` completes,
-/// the indicator will disappear.
-///
-/// This callback creates a `Completer<Null>` every time it is called. The
-/// Completer is then emitted to any listener. You can then use
-/// `completer.complete()` to indicate your async operation is done, and the
-/// `RefreshIndicator` will be hidden.
-class RefreshStreamCallback extends StreamCallback<Completer<Null>> {
-  Future<Null> call() {
-    final completer = new Completer<Null>();
-
-    streamController.add(completer);
-
-    return completer.future;
-  }
 }
 
 /// The base single-value implementation
@@ -162,4 +151,24 @@ class DraggableCanceledEvent {
 /// Handles generic [ValueChanged] events
 class ValueChangedStreamCallback<T> extends StreamCallback<T> {
   void call(T value) => streamController.add(value);
+}
+
+/// Handles [RefreshCallback] events
+///
+/// In order to use a `RefreshIndicator` widget, you must provide a
+/// `Future<Null>` to the `onRefresh` callback. When the `Future` completes,
+/// the indicator will disappear.
+///
+/// This callback creates a `Completer<Null>` every time it is called. The
+/// Completer is then emitted to any listener. You can then use
+/// `completer.complete()` to indicate your async operation is done, and the
+/// `RefreshIndicator` will be hidden.
+class RefreshStreamCallback extends StreamCallback<Completer<Null>> {
+  Future<Null> call() {
+    final completer = new Completer<Null>();
+
+    streamController.add(completer);
+
+    return completer.future;
+  }
 }

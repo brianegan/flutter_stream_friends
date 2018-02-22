@@ -1,3 +1,4 @@
 library flutter_stream_friends;
 
-export 'src/flutter_stream_callbacks.dart';
+export 'src/stream_callbacks.dart';
+export 'src/infinite_scroll_stream.dart';
