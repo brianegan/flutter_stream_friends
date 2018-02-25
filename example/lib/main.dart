@@ -17,15 +17,11 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: new StreamBuilder(
-          stream: new CounterScreenStream(appTitle),
-          builder: (context, snapshot) => buildHome(
-              context,
-              snapshot.hasData
-                  // If our stream has delivered data, build our Widget properly
-                  ? snapshot.data
-                  // If not, we pass through a dummy model to kick things off
-                  : new CounterScreenModel(0, () {}, appTitle))),
+      home: new StreamBuilder<CounterScreenModel>(
+        stream: new CounterScreenStream(appTitle),
+        initialData: new CounterScreenModel(0, () {}, appTitle),
+        builder: (context, snapshot) => buildHome(context, snapshot.data),
+      ),
     );
   }
 
@@ -53,27 +49,25 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class CounterScreenStream extends Stream<CounterScreenModel> {
-  final Stream<CounterScreenModel> _stream;
-
-  CounterScreenStream(String title,
-      [VoidStreamCallback onFabPressed, int initialValue = 0])
-      : this._stream = createStream(
-            title, onFabPressed ?? new VoidStreamCallback(), initialValue);
-
-  @override
-  StreamSubscription<CounterScreenModel> listen(
-          void onData(CounterScreenModel event),
-          {Function onError,
-          void onDone(),
-          bool cancelOnError}) =>
-      _stream.listen(onData,
-          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+class CounterScreenStream extends StreamView<CounterScreenModel> {
+  CounterScreenStream(
+    String title, [
+    VoidStreamCallback onFabPressed,
+    int initialValue = 0,
+  ])
+      : super(createStream(
+          title,
+          onFabPressed ?? new VoidStreamCallback(),
+          initialValue,
+        ));
 
   // The method we use to create the stream that will continually deliver data
   // to the `buildHome` method.
   static Stream<CounterScreenModel> createStream(
-      String title, VoidStreamCallback onFabPressed, int initialValue) {
+    String title,
+    VoidStreamCallback onFabPressed,
+    int initialValue,
+  ) {
     return new Observable(onFabPressed) // Every time the FAB is clicked
         .map((_) => 1) // Emit the value of 1
         .scan(
@@ -103,13 +97,12 @@ class CounterScreenModel {
       other is CounterScreenModel &&
           runtimeType == other.runtimeType &&
           title == other.title &&
-          count == other.count &&
-          onFabPressed == other.onFabPressed;
+          count == other.count;
 
   @override
-  int get hashCode => title.hashCode ^ count.hashCode ^ onFabPressed.hashCode;
+  int get hashCode => title.hashCode ^ count.hashCode;
 
   @override
   String toString() =>
-      'StreamWidgetDemoModel{title: $title, count: $count, onFabPressed: $onFabPressed}';
+      'CounterScreenModel{title: $title, count: $count, onFabPressed: $onFabPressed}';
 }
