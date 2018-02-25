@@ -15,6 +15,7 @@ import 'package:flutter/widgets.dart';
 /// to this problem.
 class InfiniteScrollStream extends StreamView<Null> {
   final ScrollController scrollController;
+  final StreamController streamController;
 
   /// Constructor for InfiniteScrollStream.
   ///
@@ -28,13 +29,13 @@ class InfiniteScrollStream extends StreamView<Null> {
     int pixelsFromBottom: 500,
   }) {
     final _scrollController = scrollController ?? new ScrollController();
-    final streamController = new StreamController<Null>.broadcast(sync: true);
+    final _streamController = new StreamController<Null>.broadcast(sync: true);
     final listener = () {
       final extent = _scrollController.position.maxScrollExtent;
       final offset = _scrollController.offset;
 
       if (extent - offset < pixelsFromBottom) {
-        streamController.add(null);
+        _streamController.add(null);
       }
     };
 
@@ -42,17 +43,22 @@ class InfiniteScrollStream extends StreamView<Null> {
     _scrollController.addListener(listener);
 
     // Ensure we clean up the StreamController and Listener
-    streamController.onCancel = () {
+    _streamController.onCancel = () {
       _scrollController.removeListener(listener);
-      return streamController.close();
+      return _streamController.close();
     };
 
     return new InfiniteScrollStream._(
       _scrollController,
-      streamController.stream,
+      _streamController,
+      _streamController.stream,
     );
   }
 
-  InfiniteScrollStream._(this.scrollController, Stream<Null> stream)
+  InfiniteScrollStream._(
+    this.scrollController,
+    this.streamController,
+    Stream<Null> stream,
+  )
       : super(stream);
 }
