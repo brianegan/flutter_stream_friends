@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+  * Support Dart 2
+
 ## 0.7.0
 
   * Automatically closes the `streamCotroller` when all subscriptions to a StreamCallback are cancelled

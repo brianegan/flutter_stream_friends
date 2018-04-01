@@ -40,133 +40,177 @@ void main() {
       expect(position, isNotNull);
     });
 
-    test('VoidStreamCallback should be a VoidCallback',
-        () => expect(new VoidStreamCallback() is VoidCallback, isTrue));
+    test(
+        'VoidStreamCallback should be a VoidCallback',
+        () => expect(
+              new VoidStreamCallback().call is VoidCallback,
+              isTrue,
+            ));
 
     test(
         'DragDownStreamCallback should be a DragDownCallback',
         () => expect(
-            new DragDownStreamCallback() is GestureDragDownCallback, isTrue));
+              new DragDownStreamCallback().call is GestureDragDownCallback,
+              isTrue,
+            ));
 
     test(
         'DragStartStreamCallback should be a DragStartCallback',
         () => expect(
-            new DragStartStreamCallback() is GestureDragStartCallback, isTrue));
+              new DragStartStreamCallback().call is GestureDragStartCallback,
+              isTrue,
+            ));
 
     test(
         'DragUpdateStreamCallback should be a DragUpdateCallback',
         () => expect(
-            new DragUpdateStreamCallback() is GestureDragUpdateCallback,
-            isTrue));
+              new DragUpdateStreamCallback().call is GestureDragUpdateCallback,
+              isTrue,
+            ));
 
     test(
         'DragEndStreamCallback should be a DragEndCallback',
         () => expect(
-            new DragEndStreamCallback() is GestureDragEndCallback, isTrue));
+              new DragEndStreamCallback().call is GestureDragEndCallback,
+              isTrue,
+            ));
 
     test(
         'DragCancelStreamCallback should be a DragCancelCallback',
         () => expect(
-            new DragCancelStreamCallback() is GestureDragCancelCallback,
-            isTrue));
+              new DragCancelStreamCallback().call is GestureDragCancelCallback,
+              isTrue,
+            ));
 
     test(
         'LongPressCallback should be a LongCallback',
         () => expect(
-            new LongPressStreamCallback() is GestureLongPressCallback, isTrue));
+              new LongPressStreamCallback().call is GestureLongPressCallback,
+              isTrue,
+            ));
 
     test(
         'MultiTapDownStreamCallback should be a MultiTapDownCallback',
         () => expect(
-            new MultiTapDownStreamCallback() is GestureMultiTapDownCallback,
-            isTrue));
+              new MultiTapDownStreamCallback().call
+                  is GestureMultiTapDownCallback,
+              isTrue,
+            ));
 
     test(
         'MultiTapUpStreamCallback should be a MultiTapUpCallback',
         () => expect(
-            new MultiTapUpStreamCallback() is GestureMultiTapUpCallback,
-            isTrue));
+              new MultiTapUpStreamCallback().call is GestureMultiTapUpCallback,
+              isTrue,
+            ));
 
     test(
         'MultiTapStreamCallback should be a MultiTapCallback',
         () => expect(
-            new MultiTapStreamCallback() is GestureMultiTapCallback, isTrue));
+              new MultiTapStreamCallback().call is GestureMultiTapCallback,
+              isTrue,
+            ));
 
     test(
         'MultiTapCancelStreamCallback should be a MultiTapCancelCallback',
         () => expect(
-            new MultiTapCancelStreamCallback() is GestureMultiTapCancelCallback,
-            isTrue));
+              new MultiTapCancelStreamCallback().call
+                  is GestureMultiTapCancelCallback,
+              isTrue,
+            ));
 
     test(
         'MultiTapDownStreamCallback should be a TapCallback',
         () => expect(
-            new MultiTapDownStreamCallback() is GestureMultiTapDownCallback,
-            isTrue));
+              new MultiTapDownStreamCallback().call
+                  is GestureMultiTapDownCallback,
+              isTrue,
+            ));
 
     test(
         'MultiTapUpStreamCallback should be a TapCancelCallback',
         () => expect(
-            new MultiTapUpStreamCallback() is GestureMultiTapUpCallback,
-            isTrue));
+              new MultiTapUpStreamCallback().call is GestureMultiTapUpCallback,
+              isTrue,
+            ));
 
     test(
         'ScaleStartStreamCallback should be a ScaleStartCallback',
         () => expect(
-            new ScaleStartStreamCallback() is GestureScaleStartCallback,
-            isTrue));
+              new ScaleStartStreamCallback().call is GestureScaleStartCallback,
+              isTrue,
+            ));
 
     test(
         'ScaleUpdateStreamCallback should be a ScaleUpdateCallback',
         () => expect(
-            new ScaleUpdateStreamCallback() is GestureScaleUpdateCallback,
-            isTrue));
+              new ScaleUpdateStreamCallback().call
+                  is GestureScaleUpdateCallback,
+              isTrue,
+            ));
 
     test(
         'ScaleEndStreamCallback should be a ScaleEndCallback',
         () => expect(
-            new ScaleEndStreamCallback() is GestureScaleEndCallback, isTrue));
+              new ScaleEndStreamCallback().call is GestureScaleEndCallback,
+              isTrue,
+            ));
 
     test(
         'TapDownStreamCallback should be a TapDownCallback',
         () => expect(
-            new TapDownStreamCallback() is GestureTapDownCallback, isTrue));
+              new TapDownStreamCallback().call is GestureTapDownCallback,
+              isTrue,
+            ));
 
     test(
         'TapUpStreamCallback should be a TapUpCallback',
-        () =>
-            expect(new TapUpStreamCallback() is GestureTapUpCallback, isTrue));
+        () => expect(
+              new TapUpStreamCallback().call is GestureTapUpCallback,
+              isTrue,
+            ));
 
-    test('TapStreamCallback should be a TapCallback',
-        () => expect(new TapStreamCallback() is GestureTapCallback, isTrue));
+    test(
+        'TapStreamCallback should be a TapCallback',
+        () => expect(
+              new TapStreamCallback().call is GestureTapCallback,
+              isTrue,
+            ));
 
     test(
         'TapCancelStreamCallback should be a TapCancelCallback',
         () => expect(
-            new TapCancelStreamCallback() is GestureTapCancelCallback, isTrue));
+              new TapCancelStreamCallback().call is GestureTapCancelCallback,
+              isTrue,
+            ));
 
     test(
         'DismissDirectionStreamCallback should be a TapCancelCallback',
         () => expect(
-            new DismissDirectionStreamCallback() is DismissDirectionCallback,
-            isTrue));
+              new DismissDirectionStreamCallback().call
+                  is DismissDirectionCallback,
+              isTrue,
+            ));
 
     test(
         'DraggableCanceledStreamCallback should be a DraggableCanceledCallback',
         () => expect(
-            new DraggableCanceledStreamCallback() is DraggableCanceledCallback,
-            isTrue));
+              new DraggableCanceledStreamCallback().call
+                  is DraggableCanceledCallback,
+              isTrue,
+            ));
 
     test(
         'ValueChangedStreamCallback should be a generic ValueChanged<T>',
         () => expect(
-              new ValueChangedStreamCallback<String>() is ValueChanged<String>,
+              new ValueChangedStreamCallback<String>().call
+                  is ValueChanged<String>,
               isTrue,
             ));
 
     test('RefreshStreamCallback should be a generic RefreshCallback', () {
       expect(
-        new RefreshStreamCallback() is RefreshCallback,
+        new RefreshStreamCallback().call is RefreshCallback,
         isTrue,
       );
     });
